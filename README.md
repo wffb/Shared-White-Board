@@ -208,7 +208,7 @@ When I first designed the image drawing process for the Server-Client model, my 
 1. Client send the shape data to the server first
 2. Only after the user would receive the updated data from the server, it would draw the graphics locally.
 
-![image-20250520170822117](README.assets/image-20250520170822117.png)
+![image-20250603114702237](README.assets/image-20250603114702237.png)
 
 
 
