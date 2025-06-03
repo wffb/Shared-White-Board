@@ -1,0 +1,12 @@
+20:39:50.564 [main] ERROR server.ServerProcessor - Server RMI initialization failed 
+20:40:00.480 [main] ERROR server.ServerProcessor - Server RMI initialization failed 
+20:41:07.736 [main] ERROR server.ServerProcessor - Server RMI initialization failed: Port already in use: 1099; nested exception is: 
+	java.net.BindException: Address already in use: bind
+20:41:29.598 [main] INFO  server.ServerSocketHandler - /127.0.0.1:63269 online
+20:42:01.508 [main] INFO  server.ServerProcessor - User:werb join success!
+20:42:01.508 [main] INFO  server.ServerSocketHandler - Server is broadcasting
+20:42:01.524 [Thread-0] INFO  client.ClientProcessor - werb join server success
+20:42:05.488 [main] INFO  server.ServerSocketHandler - Server is broadcasting
+20:42:05.499 [main] INFO  model.gui.Gui - werb /127.0.0.1:63269:  outline for kicked out
+20:42:05.500 [Thread-0] INFO  client.ClientProcessor - Connection has been closed
+20:42:07.985 [AWT-EventQueue-0] INFO  server.ServerSocketHandler - Server is broadcasting
