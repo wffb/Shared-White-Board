@@ -13,14 +13,9 @@ public class RimProcessorImp extends UnicastRemoteObject implements RmiProcessor
 
     private final List<Shape> shapeList;
 
-    private final List<User> userList;
 
-    private final List<String> usernameList;
-
-    public RimProcessorImp(List<Shape> shapeList, List<User> userList,List<String> usernameList) throws RemoteException{
+    public RimProcessorImp(List<Shape> shapeList) throws RemoteException{
         this.shapeList = shapeList;
-        this.userList=userList;
-        this.usernameList= usernameList;
     }
 
     @Override
@@ -43,7 +38,7 @@ public class RimProcessorImp extends UnicastRemoteObject implements RmiProcessor
 
     @Override
     public List<String> getUsernames() throws RemoteException {
-        return usernameList;
+        return UserProcessor.getINSTANCE().getUsernames();
     }
 
     @Override

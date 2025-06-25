@@ -152,7 +152,7 @@ public class ServerSocketHandler {
 
 
     //Broadcast the message to other channel
-    private void sendInfoToAllClients(JSONObject json) throws IOException {
+    private synchronized void sendInfoToAllClients(JSONObject json) throws IOException {
 
         log.info("Server is broadcasting");
 

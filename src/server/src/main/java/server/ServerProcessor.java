@@ -16,28 +16,25 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 public class ServerProcessor {
 
-    private static  ArrayList<Shape> shapeList;
+    private static CopyOnWriteArrayList<Shape> shapeList;
     private static RmiProcessor processor;
 
-    private static ArrayList<User> userList;
-    private static ArrayList<String> usernameList;
+
 
     public static void run() {
 
-        shapeList = new ArrayList<>();
-        userList = new ArrayList<>();
-        usernameList = new ArrayList<>();
-
+        shapeList = new CopyOnWriteArrayList<>();
 
         //rmi build
 
         try {
 
-            processor = new RimProcessorImp(shapeList,userList,usernameList);
+            processor = new RimProcessorImp(shapeList);
             //rmi registry
             Registry serverRegistry = LocateRegistry.createRegistry(ServerConfig.serverRMIPort);
             serverRegistry.bind(ServerConfig.serverName, processor);
@@ -50,15 +47,7 @@ public class ServerProcessor {
 
         //board run
         //manager account create
-        userList.add(new User(
-                ServerConfig.adminUsername,
-                null,
-                ServerConfig.serverHost+": "+ServerConfig.serverSocketPort,
-                null
-                ));
-        usernameList.add(ServerConfig.adminUsername);
-
-        Gui.init(shapeList,processor,userList,usernameList);
+        Gui.init(shapeList,processor);
 
 
         //socket build
@@ -67,6 +56,11 @@ public class ServerProcessor {
     }
 
     public static class ServerProcessorHelper {
+
+
+
+
+
 
         //the behavior of the server
         public static JSONObject parseJson(JSONObject object, SocketChannel channel, SelectionKey key){
@@ -102,6 +96,7 @@ public class ServerProcessor {
             JSONObject obj = new JSONObject();
 
             String username = (String) object.get("Username");
+
             //username can not be empty
             if(Objects.isNull(username) || username.isEmpty()){
                 obj.put("Type","denyJoin");
@@ -109,8 +104,9 @@ public class ServerProcessor {
                 log.info("User:"+username+" join failed for: "+"username dont exist");
                 return obj;
             }
+
             //judge existed
-            if(usernameList.contains(username)){
+            if(UserProcessor.INSTANCE.exists(username)){
                 obj.put("Type","denyJoin");
                 obj.put("Info","username already existed");
                 log.info("User:"+username+" join failed for: "+"username already existed");
@@ -145,8 +141,7 @@ public class ServerProcessor {
             }
 
             //accept
-            userList.add(userAdded);
-            usernameList.add(username);
+            UserProcessor.getINSTANCE().addUser(userAdded);
 
             //add to user list
             Gui.refreshUserPanel();
@@ -156,7 +151,7 @@ public class ServerProcessor {
              * problem solved
              */
             obj.put("Type","updateUser");
-            obj.put("Users",usernameList);
+            obj.put("Users",UserProcessor.getINSTANCE().getUsernames());
             log.info("User:"+username+" join success!");
 
             return obj;

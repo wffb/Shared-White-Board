@@ -224,5 +224,12 @@ This form can not only display the image drawn by the user in a timely manner, b
 
 
 
+### Change Log
 
+**1.1**
+
+- Improved the modular design of the code
+- Introduced thread pools and corresponding concurrent security design to enhance performance
+
+ Besides, here are some personal [Thought](doc/ThoughtsAboutConcurrency.md)  (in Chinese) on concurrent design of the project.
 

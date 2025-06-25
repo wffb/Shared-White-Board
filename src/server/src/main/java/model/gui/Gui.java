@@ -11,6 +11,7 @@ import model.listener.*;
 import model.shape.Shape;
 import server.RmiProcessor;
 import server.ServerSocketHandler;
+import server.UserProcessor;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 @Slf4j
@@ -53,24 +55,18 @@ public class Gui extends JFrame{
     private static JPanel colorNow;
     private static JLabel status;
 
-    private static ArrayList<User> userList;
 
     /**
      * can change to concurrentMap
      */
-    private static ArrayList<String> usernameList;
 
 
 
-    private static ArrayList<String> chatMsgList = new ArrayList<>();
+    private static CopyOnWriteArrayList<String> chatMsgList = new CopyOnWriteArrayList<>();
     private static JPanel chatMsgContainer;
 
 
-    public static void init(ArrayList<Shape> shapeList, RmiProcessor processor, ArrayList<User> userList1, ArrayList<String> usernameList1){
-
-        userList= userList1;
-        usernameList = usernameList1;
-
+    public static void init(CopyOnWriteArrayList<Shape> shapeList, RmiProcessor processor){
 
         INSTANCE = new Gui(shapeList,processor);
 
@@ -80,7 +76,7 @@ public class Gui extends JFrame{
     }
 
 
-    private Gui(ArrayList<Shape> shapeList, RmiProcessor processor){
+    private Gui(CopyOnWriteArrayList<Shape> shapeList, RmiProcessor processor){
 
 
         /**
@@ -468,12 +464,10 @@ public class Gui extends JFrame{
 
     public static void refreshUserPanel() {
 
-        userPanel.removeAll();
-        userPanel.revalidate();
-
         int userCount = 0;
+        JPanel newPanel = new JPanel();
 
-        for (User user : userList) {
+        for (User user : UserProcessor.getINSTANCE().getUsers()) {
 
             JPanel userRowPanel = new JPanel();
             //border
@@ -550,12 +544,19 @@ public class Gui extends JFrame{
                 userRowPanel.add(kickButton);
                 userRowPanel.add(Box.createHorizontalStrut(10));
             }
-            userPanel.add(userRowPanel);
+            newPanel.add(userRowPanel);
             userCount++;
         }
 
-        userPanel.repaint();
-        userPanel.revalidate();
+        //Concurrent control of the limited scope
+        synchronized (Gui.class){
+
+            userPanel = newPanel;
+            userPanel.repaint();
+            userPanel.revalidate();
+
+        }
+
     }
 
     private JPanel buildChatPanel(){
@@ -666,8 +667,7 @@ public class Gui extends JFrame{
         String userAddress = user.getRemoteAddress();
 
         //cancel in cache
-        userList.remove(user);
-        usernameList.remove(user.getUsername());
+        UserProcessor.getINSTANCE().deleteUser(user);
         refreshUserPanel();
 
         //inform user
@@ -689,16 +689,6 @@ public class Gui extends JFrame{
 
     public static void removeUserByUsername(String username){
 
-         if(!usernameList.contains(username))
-             return;
-
-         User get = null;
-         for(User user : userList)
-             if(user.getUsername().equals(username)){
-                 get = user;
-                 break;
-             }
-
-         removeUser(get);
+         removeUser(UserProcessor.getINSTANCE().getUserByUsername(username));
     }
 }
